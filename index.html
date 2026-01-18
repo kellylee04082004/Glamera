@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Booth</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- HOME (NYC SCENE) -->
+  <main class="home_scene" id="homeView">
+    <img src="images/logo.png" alt="" class="home_logo">
+
+    <button class="booth_hotspot" id="boothHotspot" aria-label="Take Picture">
+      <img
+        id="boothHotspotImg"
+        class="home_hotspot_img"
+        src="images/home.png"
+        alt="Take Picture"
+      />
+    </button>
+
+    <div class="mode_popup" id="modePopup" aria-hidden="true">
+      <div class="mode_popup_card">
+        <div class="mode_popup_title">Choose your format</div>
+
+        <div class="mode_popup_actions">
+          <button class="mode_choice_btn" data-mode="polaroid">Polaroid</button>
+          <button class="mode_choice_btn" data-mode="photobooth">Photobooth</button>
+        </div>
+
+        <button class="mode_popup_close" id="closeModePopup" aria-label="Close">close</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- CAMERA -->
+  <main class="camera_container" id="cameraView" style="display:none;">
+    <div class="camera_stage">
+      <div class="hint_text" id="hintText">Choose a filter, then tap take picture</div>
+
+      <div class="video_wrapper">
+        <video id="video" autoplay playsinline></video>
+        <div class="live_filter_overlay" id="liveFilterOverlay"></div>
+        <div class="countdown_overlay" id="countdownOverlay" style="display:none;"></div>
+        <div class="flash_overlay" id="flashOverlay"></div>
+      </div>
+
+      <div class="filter_panel" aria-label="Filter selection">
+        <button class="filter_btn active" data-filter="orig" id="filterOrigBtn">Original</button>
+        <button class="filter_btn" data-filter="bw" id="filterBwBtn">Vintage BW</button>
+        <button class="filter_btn" data-filter="rio" id="filterRioBtn">Rio de Janeiro</button>
+      </div>
+
+      <section class="photobooth_preview" id="photoboothPreview" style="display:none;"></section>
+
+      <button class="continue_btn" id="continueBtn" style="display:none;">Continue</button>
+
+      <div class="button_row">
+        <button class="icon_button icon_button_stack" id="captureBtn" aria-label="Take Picture">
+          <img src="images/take_photo.png" alt="" class="icon_img icon_img_small">
+          <span class="icon_label">take picture</span>
+        </button>
+
+        <button class="icon_button icon_button_stack" id="backBtn" aria-label="Go Back">
+          <img src="images/go_back.png" alt="" class="icon_img icon_img_small">
+          <span class="icon_label">go back</span>
+
+        </button>
+      </div>
+    </div>
+
+    <canvas id="captureCanvas" style="display:none;"></canvas>
+  </main>
+
+  <!-- PHOTOBOOTH PRINT PAGE -->
+  <main class="print_container" id="printView" style="display:none;">
+    <div class="print_stage">
+      <div class="print_title">YOUR PHOTOBOOTH STRIP</div>
+
+      <div class="strip_slot">
+        <div class="strip_slot_topbar"></div>
+        <img id="stripDropImg" class="strip_drop_img" alt="Photobooth Strip" />
+      </div>
+
+      <div class="print_actions">
+        <button class="icon_button icon_button_stack" id="downloadBtn" aria-label="Download">
+          <img src="images/download.png" alt="" class="icon_img icon_img_small">
+          <div class="icon_label">download</div>
+        </button>
+
+        <button class="icon_button icon_button_stack" id="retakeBtn" aria-label="Retake">
+          <img src="images/retake.png" alt="" class="icon_img icon_img_small">
+          <div class="icon_label">retake</div>
+        </button>
+
+        <button class="icon_button icon_button_stack" id="printHomeBtn" aria-label="Go Back">
+          <img src="images/go_back.png" alt="" class="icon_img icon_img_small">
+          <div class="icon_label">go back</div>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- POLAROID RESULT -->
+  <main class="edit_container" id="editView" style="display:none;">
+    <div class="result_title" id="resultTitle">Your polaroid</div>
+
+    <img id="resultImage" class="result_image" alt="Result" />
+
+    <div class="edit_buttons">
+      <button class="icon_button icon_button_stack" id="editDownloadBtn" aria-label="Download">
+        <img src="images/download.png" alt="" class="icon_img">
+        <div class="icon_label">download</div>
+      </button>
+
+      <button class="icon_button icon_button_stack" id="editRetakeBtn" aria-label="Retake">
+        <img src="images/retake.png" alt="" class="icon_img">
+        <div class="icon_label">retake</div>
+      </button>
+
+      <button class="icon_button icon_button_stack" id="editHomeBtn" aria-label="Go Back">
+        <img src="images/go_back.png" alt="" class="icon_img">
+        <div class="icon_label">go back</div>
+      </button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
