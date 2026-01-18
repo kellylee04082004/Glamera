@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,9 +9,9 @@
 </head>
 
 <body>
-  <!-- HOME (NYC SCENE) -->
+  <!-- HOME -->
   <main class="home_scene" id="homeView">
-    <img src="images/logo.png" alt="" class="home_logo">
+    <img src="images/logo.png" alt="" class="home_logo" />
 
     <button class="booth_hotspot" id="boothHotspot" aria-label="Take Picture">
       <img
@@ -42,9 +43,25 @@
 
       <div class="video_wrapper">
         <video id="video" autoplay playsinline></video>
+
+        <!-- Color filters preview overlay (BW, Rio) -->
         <div class="live_filter_overlay" id="liveFilterOverlay"></div>
+
+        <!-- Dog effects preview canvas -->
+        <canvas id="fxCanvas" class="fx_canvas"></canvas>
+
+        <!-- Countdown must be ABOVE everything -->
         <div class="countdown_overlay" id="countdownOverlay" style="display:none;"></div>
+
+        <!-- Flash overlay -->
         <div class="flash_overlay" id="flashOverlay"></div>
+
+        <!-- Effect selector on the side -->
+        <div class="effect_panel" aria-label="Effect selection">
+          <button class="effect_btn active" id="effectNoneBtn" data-effect="none">None</button>
+          <button class="effect_btn" id="effectDogBtn" data-effect="dog">Dog</button>
+          <button class="effect_btn" id="effectSpottyBtn" data-effect="spotty">Spotty Pup</button>
+        </div>
       </div>
 
       <div class="filter_panel" aria-label="Filter selection">
@@ -54,19 +71,17 @@
       </div>
 
       <section class="photobooth_preview" id="photoboothPreview" style="display:none;"></section>
-
       <button class="continue_btn" id="continueBtn" style="display:none;">Continue</button>
 
       <div class="button_row">
         <button class="icon_button icon_button_stack" id="captureBtn" aria-label="Take Picture">
-          <img src="images/take_photo.png" alt="" class="icon_img icon_img_small">
+          <img src="images/take_photo.png" alt="" class="icon_img_small" />
           <span class="icon_label">take picture</span>
         </button>
 
         <button class="icon_button icon_button_stack" id="backBtn" aria-label="Go Back">
-          <img src="images/go_back.png" alt="" class="icon_img icon_img_small">
+          <img src="images/go_back.png" alt="" class="icon_img_small" />
           <span class="icon_label">go back</span>
-
         </button>
       </div>
     </div>
@@ -86,17 +101,17 @@
 
       <div class="print_actions">
         <button class="icon_button icon_button_stack" id="downloadBtn" aria-label="Download">
-          <img src="images/download.png" alt="" class="icon_img icon_img_small">
+          <img src="images/download.png" alt="" class="icon_img_small" />
           <div class="icon_label">download</div>
         </button>
 
         <button class="icon_button icon_button_stack" id="retakeBtn" aria-label="Retake">
-          <img src="images/retake.png" alt="" class="icon_img icon_img_small">
+          <img src="images/retake.png" alt="" class="icon_img_small" />
           <div class="icon_label">retake</div>
         </button>
 
         <button class="icon_button icon_button_stack" id="printHomeBtn" aria-label="Go Back">
-          <img src="images/go_back.png" alt="" class="icon_img icon_img_small">
+          <img src="images/go_back.png" alt="" class="icon_img_small" />
           <div class="icon_label">go back</div>
         </button>
       </div>
@@ -111,22 +126,23 @@
 
     <div class="edit_buttons">
       <button class="icon_button icon_button_stack" id="editDownloadBtn" aria-label="Download">
-        <img src="images/download.png" alt="" class="icon_img">
+        <img src="images/download.png" alt="" class="icon_img" />
         <div class="icon_label">download</div>
       </button>
 
       <button class="icon_button icon_button_stack" id="editRetakeBtn" aria-label="Retake">
-        <img src="images/retake.png" alt="" class="icon_img">
+        <img src="images/retake.png" alt="" class="icon_img" />
         <div class="icon_label">retake</div>
       </button>
 
       <button class="icon_button icon_button_stack" id="editHomeBtn" aria-label="Go Back">
-        <img src="images/go_back.png" alt="" class="icon_img">
+        <img src="images/go_back.png" alt="" class="icon_img" />
         <div class="icon_label">go back</div>
       </button>
     </div>
   </main>
 
-  <script src="script.js?v=8"></script>
+  <!-- IMPORTANT: module is required for MediaPipe import -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
