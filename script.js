@@ -5,8 +5,7 @@
     photoboothPhotos: [],
     currentStripUrl: "",
     finalDownloadUrl: "",
-    isCapturing: false,
-    canvasFilterSupported: true
+    isCapturing: false
   };
 
   const els = {
@@ -73,7 +72,9 @@
 
   async function startCamera() {
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" }
+      });
       els.video.srcObject = mediaStream;
 
       await new Promise((resolve) => {
@@ -106,31 +107,6 @@
     if (filterName === "rio") els.liveFilterOverlay.classList.add("filter_rio");
   }
 
-  function detectCanvasFilterSupport() {
-    try {
-      const src = document.createElement("canvas");
-      src.width = 2;
-      src.height = 2;
-      const sctx = src.getContext("2d");
-      sctx.fillStyle = "rgb(255,0,0)";
-      sctx.fillRect(0, 0, 2, 2);
-
-      const dst = document.createElement("canvas");
-      dst.width = 2;
-      dst.height = 2;
-      const dctx = dst.getContext("2d");
-      dctx.filter = "grayscale(1)";
-      dctx.drawImage(src, 0, 0);
-
-      const px = dctx.getImageData(0, 0, 1, 1).data;
-      const r = px[0], g = px[1], b = px[2];
-
-      return (r === g && g === b);
-    } catch (e) {
-      return false;
-    }
-  }
-
   function clamp255(x) {
     return x < 0 ? 0 : x > 255 ? 255 : x;
   }
@@ -139,8 +115,8 @@
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
 
-    const contrast = 1.45;
-    const brightness = 3;
+    const contrast = 1.55;
+    const brightness = 4;
 
     for (let i = 0; i < d.length; i += 4) {
       const r = d[i];
@@ -164,9 +140,9 @@
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
 
-    const saturation = 1.55;
-    const contrast = 1.18;
-    const brightness = 6;
+    const saturation = 1.7;
+    const contrast = 1.2;
+    const brightness = 7;
 
     for (let i = 0; i < d.length; i += 4) {
       let r = d[i];
@@ -266,7 +242,7 @@
   async function captureFilteredFramePortrait() {
     const video = els.video;
     const canvas = els.captureCanvas;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
     const srcW = video.videoWidth;
     const srcH = video.videoHeight;
@@ -294,66 +270,23 @@
       outW,
       outH
     );
+
     ctx.restore();
 
-    if (state.filter === "bw") {
-      if (state.canvasFilterSupported) {
-        ctx.clearRect(0, 0, outW, outH);
-
-        ctx.save();
-        ctx.translate(outW, 0);
-        ctx.scale(-1, 1);
-
-        ctx.filter = "grayscale(1) contrast(1.45) brightness(1.03)";
-        ctx.drawImage(
-          video,
-          crop.sx,
-          crop.sy,
-          crop.sw,
-          crop.sh,
-          0,
-          0,
-          outW,
-          outH
-        );
-        ctx.filter = "none";
-        ctx.restore();
-      } else {
+    try {
+      if (state.filter === "bw") {
         applyBWManual(ctx, outW, outH);
+        applyVignette(ctx, outW, outH, 0.28);
       }
 
-      applyVignette(ctx, outW, outH, 0.28);
-    }
-
-    if (state.filter === "rio") {
-      if (state.canvasFilterSupported) {
-        ctx.clearRect(0, 0, outW, outH);
-
-        ctx.save();
-        ctx.translate(outW, 0);
-        ctx.scale(-1, 1);
-
-        ctx.filter = "saturate(1.7) contrast(1.18) brightness(1.1)";
-        ctx.drawImage(
-          video,
-          crop.sx,
-          crop.sy,
-          crop.sw,
-          crop.sh,
-          0,
-          0,
-          outW,
-          outH
-        );
-        ctx.filter = "none";
-        ctx.restore();
-      } else {
+      if (state.filter === "rio") {
         applyRioManual(ctx, outW, outH);
+        applyRioOverlay(ctx, outW, outH);
+        applyVignette(ctx, outW, outH, 0.22);
+        applyGrain(ctx, outW, outH, 0.05);
       }
-
-      applyRioOverlay(ctx, outW, outH);
-      applyVignette(ctx, outW, outH, 0.22);
-      applyGrain(ctx, outW, outH, 0.05);
+    } catch (err) {
+      console.warn("Filter pixel processing failed on this device:", err);
     }
 
     return canvas.toDataURL("image/png");
@@ -565,7 +498,6 @@
     ctx.fillRect(0, 0, polaroidW, polaroidH);
 
     const crop = computeCrop(srcImg.width, srcImg.height, photoAreaW, photoAreaH);
-
     ctx.drawImage(srcImg, crop.sx, crop.sy, crop.sw, crop.sh, 36, 28, photoAreaW, photoAreaH);
 
     ctx.fillStyle = "#f8f8f8";
@@ -604,7 +536,6 @@
     const ctx = canvas.getContext("2d");
 
     const crop = computeCrop(srcImg.width, srcImg.height, photoAreaW, photoAreaH);
-
     const start = performance.now();
     const duration = opts.durationMs;
 
@@ -761,9 +692,6 @@
   function init() {
     showView("home");
     setFilter("orig");
-
-    state.canvasFilterSupported = detectCanvasFilterSupport();
-    console.log("Canvas filter supported:", state.canvasFilterSupported);
 
     els.boothHotspot.addEventListener("click", () => openModePopup());
 
