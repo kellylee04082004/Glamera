@@ -52,6 +52,57 @@
   };
 
   let mediaStream = null;
+  /* =======================
+   SOUND EFFECTS
+======================= */
+const sfx = {
+  camera: new Audio("sounds/camera.mp3"),
+  slide: new Audio("sounds/slide.mp3")
+};
+
+sfx.camera.preload = "auto";
+sfx.slide.preload = "auto";
+
+sfx.camera.volume = 0.8;
+sfx.slide.volume = 0.9;
+
+let audioUnlocked = false;
+
+function unlockAudioOnce() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+
+  // iPhone Safari needs sound to be started once by a user gesture
+  [sfx.camera, sfx.slide].forEach((a) => {
+    try {
+      a.muted = true;
+      const p = a.play();
+      if (p) {
+        p.then(() => {
+          a.pause();
+          a.currentTime = 0;
+          a.muted = false;
+        }).catch(() => {
+          a.muted = false;
+        });
+      } else {
+        a.muted = false;
+      }
+    } catch (e) {
+      a.muted = false;
+    }
+  });
+}
+
+function playSfx(audioObj) {
+  if (!audioObj) return;
+  try {
+    audioObj.pause();
+    audioObj.currentTime = 0;
+    const p = audioObj.play();
+    if (p) p.catch(() => {});
+  } catch (e) {}
+}
 
   function showView(name) {
     els.homeView.style.display = name === "home" ? "block" : "none";
@@ -410,11 +461,15 @@
   }
 
   function playStripDropAnimation(stripUrl) {
-    els.stripDropImg.classList.remove("drop_active");
-    els.stripDropImg.src = stripUrl;
-    void els.stripDropImg.offsetWidth;
-    els.stripDropImg.classList.add("drop_active");
-  }
+  // SOUND: strip sliding down
+  playSfx(sfx.slide);
+
+  els.stripDropImg.classList.remove("drop_active");
+  els.stripDropImg.src = stripUrl;
+  void els.stripDropImg.offsetWidth;
+  els.stripDropImg.classList.add("drop_active");
+}
+
 
   async function takePhotobooth() {
     if (state.isCapturing) return;
@@ -679,15 +734,19 @@
   }
 
   async function triggerFlash() {
-    if (!els.flashOverlay) return;
+  if (!els.flashOverlay) return;
 
-    els.flashOverlay.classList.remove("flash_active");
-    void els.flashOverlay.offsetWidth;
-    els.flashOverlay.classList.add("flash_active");
+  // SOUND: camera shutter
+  playSfx(sfx.camera);
 
-    await sleep(170);
-    els.flashOverlay.classList.remove("flash_active");
-  }
+  els.flashOverlay.classList.remove("flash_active");
+  void els.flashOverlay.offsetWidth;
+  els.flashOverlay.classList.add("flash_active");
+
+  await sleep(170);
+  els.flashOverlay.classList.remove("flash_active");
+}
+
 
   function init() {
     showView("home");
@@ -724,10 +783,18 @@
     els.filterBwBtn.addEventListener("click", () => setFilter("bw"));
     els.filterRioBtn.addEventListener("click", () => setFilter("rio"));
 
-    els.captureBtn.addEventListener("click", handleCaptureClick);
+    els.captureBtn.addEventListener("click", () => {
+      unlockAudioOnce();
+      handleCaptureClick();
+    });
+
     els.backBtn.addEventListener("click", goHome);
 
-    els.continueBtn.addEventListener("click", openPhotoboothPrintPage);
+    els.continueBtn.addEventListener("click", () => {
+      unlockAudioOnce();
+      openPhotoboothPrintPage();
+    });
+
 
     els.downloadBtn.addEventListener("click", () => {
       state.mode = "photobooth";
